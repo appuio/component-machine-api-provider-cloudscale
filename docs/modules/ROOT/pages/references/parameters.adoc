@@ -11,9 +11,110 @@ default:: `syn-machine-api-provider-cloudscale`
 The namespace in which to deploy this component.
 
 
+== `images`
+
+[horizontal]
+type:: dict
+default:: https://github.com/projectsyn/component-machine-api-provider-cloudscale/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+The images to use for this component.
+
+
+== `secrets`
+
+[horizontal]
+type:: dict
+default:: `{}`
+
+A dictionary of secrets to create.
+The key is the name of the secret, the value is merged into the created secret.
+Namespace is automatically set to the namespace of the component.
+Commodore secret references should be passed as `stringData`.
+
+
+== `resources`
+
+[horizontal]
+type:: dict
+default:: https://github.com/projectsyn/component-machine-api-provider-cloudscale/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+Resource requests and limits for the containers deployed by this component.
+
+
+== `alerts`
+
+[horizontal]
+type:: dict
+example::
++
+[source,yaml]
+----
+BadThingsHappening:
+  enabled: true
+  rule:
+    annotations:
+      description: Bad things have been happening on {{$labels.node}} for more than 10 minutes.
+      message: Bad things have been happening on {{$labels.node}} for more than 10 minutes.
+      runbook_url: https://hub.syn.tools/machine-api-provider-cloudscale/runbooks/BadThingsHappening.html
+    expr: |
+      bad_thing_happening == 1
+    for: 10m
+    labels:
+      severity: warning
+----
+
+`alerts` defines the alerts to be installed.
+The dictionary key is used as the name of the alert.
+
+
 == Example
 
 [source,yaml]
 ----
-namespace: example-namespace
+secrets:
+  cloudscale-rw-token:
+    stringData:
+      token: XXXX
+  cloudscale-user-data:
+    stringData:
+      ignitionHost: api-int.cluster-1.appuio.cloud
+      ignitionCA: |
+        -----BEGIN CERTIFICATE-----
+        XXXXXXX
+        -----END CERTIFICATE-----
+      userData: |
+        {
+          ignition: {
+            version: '3.1.0',
+            config: {
+              merge: [ {
+                source: 'https://%s:22623/config/%s' % [ context.data.ignitionHost, std.get(context.data, 'ignitionConfigName', 'worker') ],
+              } ],
+            },
+            security: {
+              tls: {
+                certificateAuthorities: [ {
+                  source: 'data:text/plain;charset=utf-8;base64,%s' % [ std.base64(context.data.ignitionCA) ],
+                } ],
+              },
+            },
+          },
+          systemd: {
+            units: [ {
+              name: 'cloudscale-hostkeys.service',
+              enabled: true,
+              contents: "[Unit]\nDescription=Print SSH Public Keys to tty\nAfter=sshd-keygen.target\n\n[Install]\nWantedBy=multi-user.target\n\n[Service]\nType=oneshot\nStandardOutput=tty\nTTYPath=/dev/ttyS0\nExecStart=/bin/sh -c \"echo '-----BEGIN SSH HOST KEY KEYS-----'; cat /etc/ssh/ssh_host_*key.pub; echo '-----END SSH HOST KEY KEYS-----'\"",
+            } ],
+          },
+          storage: {
+            files: [ {
+              filesystem: 'root',
+              path: '/etc/hostname',
+              mode: 420,
+              contents: {
+                source: 'data:,%s' % context.machine.metadata.name,
+              },
+            } ],
+          },
+        }
 ----
