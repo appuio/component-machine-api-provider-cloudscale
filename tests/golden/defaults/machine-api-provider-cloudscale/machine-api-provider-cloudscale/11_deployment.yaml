@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: machine-api-provider-cloudscale
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: machine-api-provider
+    app.kubernetes.io/part-of: syn
+    name: appuio-machine-api-provider-cloudscale
+  name: appuio-machine-api-provider-cloudscale
+  namespace: openshift-machine-api
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: machine-api-provider-cloudscale
+      app.kubernetes.io/name: machine-api-provider
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app.kubernetes.io/instance: machine-api-provider-cloudscale
+        app.kubernetes.io/name: machine-api-provider
+    spec:
+      containers:
+        - args:
+            - -metrics-bind-address=127.0.0.1:8080
+            - -health-probe-bind-address=:8081
+            - -leader-elect=true
+            - -namespace=openshift-machine-api
+          command:
+            - machine-api-provider-cloudscale
+            - -target=manager
+          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          name: manager
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+        - args:
+            - -metrics-bind-address=127.0.0.1:8082
+            - -health-probe-bind-address=:8083
+            - -leader-elect=true
+            - -namespace=openshift-machine-api
+          command:
+            - machine-api-provider-cloudscale
+            - -target=machine-api-controllers-manager
+          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /readyz
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          name: machine-api-controllers-manager
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8083
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+        - args:
+            - --secure-listen-address=0.0.0.0:8440
+            - --upstream=http://localhost:8080
+            - --logtostderr=true
+            - --v=0
+          image: gcr.io/kubebuilder/kube-rbac-proxy:v0.16.0
+          imagePullPolicy: IfNotPresent
+          name: kube-rbac-proxy-manager-metrics
+          ports:
+            - containerPort: 8440
+              name: manager-metrics
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 20Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - args:
+            - --secure-listen-address=0.0.0.0:8442
+            - --upstream=http://localhost:8082
+            - --logtostderr=true
+            - --v=0
+          image: gcr.io/kubebuilder/kube-rbac-proxy:v0.16.0
+          imagePullPolicy: IfNotPresent
+          name: kube-rbac-proxy-mac-metrics
+          ports:
+            - containerPort: 8442
+              name: mac-metrics
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 20Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/master: ''
+      priorityClassName: system-node-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: appuio-machine-api-provider-cloudscale
+      serviceAccountName: appuio-machine-api-provider-cloudscale
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 120
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 120
