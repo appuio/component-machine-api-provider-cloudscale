@@ -1,0 +1,4 @@
+parameters:
+  machine_api_provider_cloudscale:
+    =_metadata: {}
+    namespace: syn-machine-api-provider-cloudscale

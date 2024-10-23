@@ -1,0 +1,31 @@
+{
+  "template": "https://github.com/projectsyn/commodore-component-template.git",
+  "commit": "dc2c2fa3a08a3c439793708b742377f0fa831b7f",
+  "checkout": "main",
+  "context": {
+    "cookiecutter": {
+      "name": "machine-api-provider-cloudscale",
+      "slug": "machine-api-provider-cloudscale",
+      "parameter_key": "machine_api_provider_cloudscale",
+      "test_cases": "defaults",
+      "add_lib": "n",
+      "add_pp": "n",
+      "add_golden": "y",
+      "add_matrix": "y",
+      "add_go_unit": "n",
+      "automerge_patch": "y",
+      "automerge_patch_v0": "y",
+      "automerge_patch_regexp_blocklist": "",
+      "automerge_patch_v0_regexp_allowlist": "",
+      "automerge_minor_regexp_allowlist": "",
+      "auto_release": "y",
+      "copyright_holder": "VSHN AG <info@vshn.ch>",
+      "copyright_year": "2024",
+      "github_owner": "appuio",
+      "github_name": "component-machine-api-provider-cloudscale",
+      "github_url": "https://github.com/appuio/component-machine-api-provider-cloudscale",
+      "_template": "https://github.com/projectsyn/commodore-component-template.git"
+    }
+  },
+  "directory": null
+}

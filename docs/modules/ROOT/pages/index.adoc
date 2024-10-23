@@ -1,0 +1,5 @@
+= machine-api-provider-cloudscale
+
+machine-api-provider-cloudscale is a Commodore component to manage machine-api-provider-cloudscale.
+
+See the xref:references/parameters.adoc[parameters] reference for further details.
