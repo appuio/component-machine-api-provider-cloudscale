@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: machine-api-provider-cloudscale
+    app.kubernetes.io/managed-by: commodore
+    app.kubernetes.io/name: machine-api-provider
+    app.kubernetes.io/part-of: syn
+    name: appuio-machine-api-provider-cloudscale
+  name: appuio-machine-api-provider-cloudscale
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: appuio-machine-api-provider-cloudscale
+    namespace: openshift-machine-api
