@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  annotations: {}
+  labels:
+    name: appuio-machine-api-provider-cloudscale
+  name: appuio-machine-api-provider-cloudscale
+  namespace: openshift-machine-api
+spec:
+  groups:
+    - name: provider.alerts
+      rules:
+        - alert: MachinesetEndpointNotFound
+          annotations:
+            description: |
+              No machineset-controller target was found. This can impact machine operations such as autoscaling.
+
+              The machineset controller is deployed by the 'machine-api-controllers-manager' container in the 'appuio-machine-api-provider-cloudscale' deployment.
+              Check for the existence of the 'appuio-machine-api-controllers' deployment and check the logs of the above manager if it does not exist.
+              If the deployment exists, check the deployment and replicaset status and events to check why the pod can't be created.
+            summary: Expected machineset target not found. Autoscaling and other machine
+              operations might be impacted.
+          expr: |
+            count(up{namespace="openshift-machine-api",endpoint=~"machineset.+"}) < 1
+          for: 15m
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: machine-api-provider-cloudscale

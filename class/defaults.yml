@@ -1,4 +1,55 @@
 parameters:
   machine_api_provider_cloudscale:
     =_metadata: {}
-    namespace: syn-machine-api-provider-cloudscale
+    namespace: openshift-machine-api
+
+    secrets: {}
+
+    images:
+      provider:
+        registry: ghcr.io
+        image: appuio/machine-api-provider-cloudscale
+        tag: v0.2.1
+      machine_api_controllers_manager:
+        registry: ghcr.io
+        image: appuio/machine-api-provider-cloudscale
+        tag: v0.2.1
+      kube_rbac_proxy:
+        registry: gcr.io
+        image: kubebuilder/kube-rbac-proxy
+        tag: v0.16.0
+
+    resources:
+      provider:
+        requests:
+          cpu: '10m'
+          memory: '32Mi'
+        limits:
+          cpu: '100m'
+          memory: '128Mi'
+
+      machine_api_controllers_manager:
+        requests:
+          cpu: '10m'
+          memory: '32Mi'
+        limits:
+          cpu: '100m'
+          memory: '64Mi'
+
+    alerts:
+      MachinesetEndpointNotFound:
+        enabled: true
+        rule:
+          expr: |
+            count(up{namespace="openshift-machine-api",endpoint=~"machineset.+"}) < 1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: Expected machineset target not found. Autoscaling and other machine operations might be impacted.
+            description: |
+              No machineset-controller target was found. This can impact machine operations such as autoscaling.
+
+              The machineset controller is deployed by the 'machine-api-controllers-manager' container in the 'appuio-machine-api-provider-cloudscale' deployment.
+              Check for the existence of the 'appuio-machine-api-controllers' deployment and check the logs of the above manager if it does not exist.
+              If the deployment exists, check the deployment and replicaset status and events to check why the pod can't be created.
