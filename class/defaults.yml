@@ -9,11 +9,11 @@ parameters:
       provider:
         registry: ghcr.io
         image: appuio/machine-api-provider-cloudscale
-        tag: v0.2.3
+        tag: v0.2.5
       machine_api_controllers_manager:
         registry: ghcr.io
         image: appuio/machine-api-provider-cloudscale
-        tag: v0.2.3
+        tag: v0.2.5
       kube_rbac_proxy:
         registry: gcr.io
         image: kubebuilder/kube-rbac-proxy
