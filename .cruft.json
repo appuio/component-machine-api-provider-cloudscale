@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/projectsyn/commodore-component-template.git",
-  "commit": "dc2c2fa3a08a3c439793708b742377f0fa831b7f",
+  "commit": "f12cbb49f928cf689cf39b98d8d7c9e88fb289f6",
   "checkout": "main",
   "context": {
     "cookiecutter": {
