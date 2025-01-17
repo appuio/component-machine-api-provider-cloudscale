@@ -16,9 +16,9 @@ parameters:
         image: appuio/machine-api-provider-cloudscale
         tag: v0.2.5
       kube_rbac_proxy:
-        registry: gcr.io
-        image: kubebuilder/kube-rbac-proxy
-        tag: v0.16.0
+        registry: quay.io
+        image: brancz/kube-rbac-proxy
+        tag: v0.18.2
 
     resources:
       provider:
