@@ -35,7 +35,7 @@ spec:
           command:
             - machine-api-provider-cloudscale
             - -target=manager
-          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.5
+          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.6
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -67,7 +67,7 @@ spec:
           command:
             - machine-api-provider-cloudscale
             - -target=machine-api-controllers-manager
-          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.5
+          image: ghcr.io/appuio/machine-api-provider-cloudscale:v0.2.6
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
