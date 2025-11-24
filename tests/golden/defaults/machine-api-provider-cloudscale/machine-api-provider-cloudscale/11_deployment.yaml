@@ -96,7 +96,7 @@ spec:
             - --upstream=http://localhost:8080
             - --logtostderr=true
             - --v=0
-          image: quay.io/brancz/kube-rbac-proxy:v0.18.2
+          image: quay.io/brancz/kube-rbac-proxy:v0.20.0
           imagePullPolicy: IfNotPresent
           name: kube-rbac-proxy-manager-metrics
           ports:
@@ -114,7 +114,7 @@ spec:
             - --upstream=http://localhost:8082
             - --logtostderr=true
             - --v=0
-          image: quay.io/brancz/kube-rbac-proxy:v0.18.2
+          image: quay.io/brancz/kube-rbac-proxy:v0.20.0
           imagePullPolicy: IfNotPresent
           name: kube-rbac-proxy-mac-metrics
           ports:
